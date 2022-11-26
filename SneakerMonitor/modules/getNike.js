@@ -49,7 +49,7 @@ function getItems(channel, itemList) {
                             let itemData = {
                                 name: item.productInfo[0].productContent.fullTitle,
                                 region: `:flag_${item.productInfo[0].merchProduct.merchGroup.toLowerCase()}:`,
-                                price: `£${item.productInfo[0].merchPrice.currentPrice}`,
+                                price: `${item.productInfo[0].merchPrice.currentPrice} ${item.productInfo[0].merchPrice.currency}`,
                                 description: item.productInfo[0].productContent.description.replace(/<[^>]+>|&[^;]+;/g, ''),
                                 colorway: item.productInfo[0].productContent.colorDescription,
                                 stylecode: item.productInfo[0].merchProduct.styleColor,
