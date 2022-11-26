@@ -3,10 +3,11 @@ const {
     EmbedBuilder
 } = require('discord.js')
 const fs = require('fs')
+const region = "gb" //https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv (Alpha-2)
 
 let a = false
 
-let next = "/product_feed/threads/v2?filter=marketplace%28GB%29&filter=language%28en-GB%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&anchor=0&count=100&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title"
+let next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : region}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
 
 function sortSizes(skus, available) {
     if (available === undefined || skus === undefined) {
@@ -23,6 +24,11 @@ function sortSizes(skus, available) {
 
         return sizes;
     }, {})
+}
+
+function getTime() {
+    const date = new Date()
+    return `${("0" + date.getDate()).slice(-2)}-${("0" + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}T${date.getHours() < 10 ? "0" + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()}:${date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds()}.${date.getMilliseconds()}`
 }
 
 function getItems(channel, itemList) {
@@ -43,7 +49,7 @@ function getItems(channel, itemList) {
                             let itemData = {
                                 name: item.productInfo[0].productContent.fullTitle,
                                 region: `:flag_${item.productInfo[0].merchProduct.merchGroup.toLowerCase()}:`,
-                                price: `${item.productInfo[0].merchPrice.currentPrice} ${item.productInfo[0].merchPrice.currency}`,
+                                price: `£${item.productInfo[0].merchPrice.currentPrice}`,
                                 description: item.productInfo[0].productContent.description.replace(/<[^>]+>|&[^;]+;/g, ''),
                                 colorway: item.productInfo[0].productContent.colorDescription,
                                 stylecode: item.productInfo[0].merchProduct.styleColor,
@@ -56,7 +62,7 @@ function getItems(channel, itemList) {
                                 sizes: sizeData,
                                 drops: channels,
                                 available: sizeData.inStock ^ false,
-                                url: `https://www.nike.com/gb/launch/t/${item.productInfo[0].productContent.slug}`
+                                url: `https://www.nike.com/${region}/launch/t/${item.productInfo[0].productContent.slug}`
                             }
                             let embed = new EmbedBuilder()
                                 .setTitle(`${itemData.name} ${itemData.colorway}`)
@@ -88,8 +94,8 @@ function getItems(channel, itemList) {
                                     inline: true
                                 })
                                 .setFooter({
-                                    text: "Nike",
-                                    iconURL: "https://cdn.discordapp.com/attachments/994594646489567312/1001233877022539936/image_1.png"
+                                    text: itemData.drops,
+                                    iconURL: "https://cdn.discordapp.com/attachments/971519655615295508/993868941464174592/piet-parra-wave-dribbble-05.png"
                                 })
                                 .setColor(`#${itemData.color}`)
                             let sizeString = ""
@@ -97,7 +103,7 @@ function getItems(channel, itemList) {
                             Object.keys(itemData.sizes).forEach(key => {
                                 if (key != "inStock") {
                                     let availability = itemData.sizes[key]
-                                    sizeString += `UK ${key} [${availability}]\n`
+                                    sizeString += `${region.toUpperCase()} ${key} [${availability}]\n`
                                     sCount++
                                     if (sCount === 6) {
                                         embed.addFields({
@@ -121,8 +127,8 @@ function getItems(channel, itemList) {
                             }
                             embed.addFields({
                                 name: "Links",
-                                value: `[StockX](https://stockx.com/search?s=${item.productInfo[0].merchProduct.styleColor})`,
-                                inline: false
+                                value: `[StockX](https://stockx.com/search?s=${itemData.stylecode.replaceAll("-","")})`,
+                                inline: true
                             })
                             if (itemData.stylecode != "AJ1986-001") {
                                 if (!itemList.hasOwnProperty(itemData.stylecode)) {
@@ -131,6 +137,11 @@ function getItems(channel, itemList) {
                                         name: "Restock",
                                         value: "FALSE :x:",
                                         inline: true
+                                    })
+                                    embed.addFields({
+                                        name: "Posted At",
+                                        value: getTime(),
+                                        inline: false
                                     })
                                     itemData.available && item.productInfo[0].merchProduct.status == "ACTIVE" ? channel.send({
                                         embeds: [embed]
@@ -144,6 +155,11 @@ function getItems(channel, itemList) {
                                             name: "Restock",
                                             value: "TRUE :white_check_mark:",
                                             inline: true
+                                        })
+                                        embed.addFields({
+                                            name: "Posted At",
+                                            value: getTime(),
+                                            inline: false
                                         })
                                         itemData.available && item.productInfo[0].merchProduct.status == "ACTIVE" ? channel.send({
                                             embeds: [embed]
@@ -166,7 +182,7 @@ function getItems(channel, itemList) {
             }
         })
     } else {
-        next = "/product_feed/threads/v2?filter=marketplace%28GB%29&filter=language%28en-GB%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&anchor=0&count=100&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title"
+        next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : region}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
     }
 }
 
