@@ -7,7 +7,7 @@ const region = "gb" //https://github.com/lukes/ISO-3166-Countries-with-Regional-
 
 let a = false
 
-let next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : region}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
+let next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : (region == "us" ? "en" : region)}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
 
 function sortSizes(skus, available) {
     if (available === undefined || skus === undefined) {
@@ -182,7 +182,7 @@ function getItems(channel, itemList) {
             }
         })
     } else {
-        next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : region}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
+        next = `/product_feed/threads/v2/?anchor=0&count=100&filter=marketplace%28${region.toUpperCase()}%29&filter=language%28${region == "gb" ? "en-GB" : (region == "us" ? "en" : region)}%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active%2Cid%2ClastFetchTime%2CproductInfo%2CpublishedContent.nodes%2CpublishedContent.subType%2CpublishedContent.properties.coverCard%2CpublishedContent.properties.productCard%2CpublishedContent.properties.products%2CpublishedContent.properties.publish.collections%2CpublishedContent.properties.relatedThreads%2CpublishedContent.properties.seo%2CpublishedContent.properties.threadType%2CpublishedContent.properties.custom%2CpublishedContent.properties.title`
     }
 }
 
