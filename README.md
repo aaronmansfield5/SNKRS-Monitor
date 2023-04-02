@@ -41,7 +41,7 @@ git clone https://github.com/aaronmansfield5/SNKRS-Monitor.git
 
 ```bash
 cd SNKRS-Monitor
-npm install discord.js dotenv request
+npm install discord.js dotenv request axios
 ```
 
 3. Create a `.env` file in the project root and add your Discord bot token:
